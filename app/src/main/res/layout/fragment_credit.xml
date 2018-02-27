@@ -8,7 +8,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
         android:orientation="horizontal">
 
         <TextView
@@ -18,15 +17,28 @@
             android:layout_weight="1"
             android:text="Сумма кредита:" />
 
-        <EditText
-            android:id="@+id/et_dogovornaya_summa"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10"
-            android:gravity="right"
-            android:hint="0.00"
-            android:inputType="numberDecimal" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_summa_credita"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="0.00"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/unit_height"
+                android:text="тг"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -40,23 +52,35 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="Срок кредита в годах:" />
+            android:text="Срок кредита:" />
 
-        <EditText
-            android:id="@+id/et_srok_credita"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10"
-            android:gravity="right"
-            android:hint="0"
-            android:inputType="numberDecimal" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_srok_credita"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="0"
+                android:inputType="number" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/unit_height"
+                android:text="мес"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
         android:orientation="horizontal">
 
         <TextView
@@ -64,23 +88,35 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="% ставка годовая:" />
+            android:text="Процентная ставка:" />
 
-        <EditText
-            android:id="@+id/et_summa_vashih_vznosov"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10"
-            android:gravity="right"
-            android:hint="0.00"
-            android:inputType="numberDecimal"  />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_procentnaya_stavka"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="0.00"
+                android:inputType="numberDecimal"  />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/unit_height"
+                android:text="%"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
         android:orientation="horizontal">
 
         <TextView
@@ -91,7 +127,7 @@
             android:text="Дата выдачи кредита:" />
 
         <EditText
-            android:id="@+id/et_data_zakritiya"
+            android:id="@+id/et_data_vydachi_credita"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -103,17 +139,9 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_calculate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Посчитать" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
         android:orientation="horizontal">
 
         <TextView
@@ -121,18 +149,98 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="Ежемесячный аннуитетный платёж:" />
+            android:text="Дата первого платежа:" />
 
         <EditText
-            android:id="@+id/et_voznagrazhdenie"
+            android:id="@+id/et_data_pervogo_platezha"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:clickable="true"
             android:ems="10"
-            android:enabled="false"
+            android:focusable="false"
             android:gravity="right"
-            android:hint="0.00"
-            android:inputType="numberDecimal" />
+            android:inputType="none"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_clean"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:text="ОБНУЛИТЬ" />
+
+        <Button
+            android:id="@+id/btn_calculate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal"
+            android:text="Посчитать" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="Ежемесячный платёж:" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_ezhemesiachnyi_platezh"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:enabled="false"
+                android:gravity="right"
+                android:hint="0.00"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/unit_height"
+                android:text="тг"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btn_export"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ЭКСПОРТ В EXCEL" />
+
     </LinearLayout>
 
 </LinearLayout>

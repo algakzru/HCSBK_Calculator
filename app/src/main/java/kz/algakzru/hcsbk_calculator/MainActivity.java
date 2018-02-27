@@ -136,16 +136,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return new DepositFragment();
-                default:
                     return new CreditFragment();
+                default:
+                    return new DepositFragment();
             }
         }
 
         @Override
         public int getCount() {
             // Show 2 total pages.
-            return 2;
+            return 1;
         }
 
         @Override
