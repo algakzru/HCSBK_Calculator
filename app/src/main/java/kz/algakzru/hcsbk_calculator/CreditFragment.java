@@ -19,6 +19,11 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.Months;
+import org.joda.time.YearMonth;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -364,6 +369,45 @@ public class CreditFragment extends Fragment {
         // diff in millis
         long diff = dataZakrytiaCreditaInMillis - dataPredposlednegoPlatezhaInMillis;
         long days = diff / (24 * 60 * 60 * 1000);
+
+        return days;
+    }
+
+    public double calculateYearFraction(LocalDate firstDate, LocalDate secondDate) {
+        int d1 = firstDate.getDayOfMonth();
+        int d2 = secondDate.getDayOfMonth();
+        if (d1 == 31) {
+            d1 = 30;
+        }
+        if (d2 == 31) {
+            d2 = 30;
+        }
+        return thirty360(
+                firstDate.getYear(), firstDate.getMonthOfYear(), d1,
+                secondDate.getYear(), secondDate.getMonthOfYear(), d2);
+    }
+
+    // calculate using the standard 30/360 function - 360(y2 - y1) + 30(m2 - m1) + (d2 - d1)) / 360
+    private double thirty360(int y1, int m1, int d1, int y2, int m2, int d2) {
+        return (360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)) / 360d;
+    }
+
+    public int calculateDays(Date d1, Date d2) {
+
+        int months = 0;
+        int days = 0;
+
+        months = Months.monthsBetween(new DateTime(d1), new DateTime(d2)).getMonths();
+
+        int endOfMonth = d1.getDate() == 31 ? 31 : 30;
+
+        if(d1.getDate() > d2.getDate()){
+            days = endOfMonth - d1.getDate() + d2.getDate();
+        }else{
+            days = d2.getDate() - d1.getDate();
+        }
+        months = months * 30;
+        days = months + days;
 
         return days;
     }

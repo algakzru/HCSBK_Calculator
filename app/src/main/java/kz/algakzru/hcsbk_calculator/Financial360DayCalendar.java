@@ -1,5 +1,7 @@
 package kz.algakzru.hcsbk_calculator;
 
+import org.joda.time.LocalDate;
+
 /**
  * Created by 816856 on 2/27/2018.
  * https://stackoverflow.com/questions/28277833/how-to-create-a-bank-calendar-with-30-days-each-month
@@ -19,7 +21,7 @@ public class Financial360DayCalendar {
 
     public static Financial360DayCalendar of(LocalDate date) {
         int year = date.getYear();
-        int month = date.getMonthValue();
+        int month = date.getMonthOfYear();
         int dayOfMonth = date.getDayOfMonth();
 
         if (dayOfMonth == 31) {
@@ -33,7 +35,7 @@ public class Financial360DayCalendar {
         // check also if other is not before this instance
         // ...
         // special algorithm (handling all intervening months as 30 days long)
-        int interestDays = 30 - this.dayOfMonth(); // current day excluded
+        int interestDays = 30 - this.dayOfMonth; // current day excluded
         int monthDelta = other.getMonthCount() - this.getMonthCount();
         if (monthDelta > 0) {
             monthDelta--;
