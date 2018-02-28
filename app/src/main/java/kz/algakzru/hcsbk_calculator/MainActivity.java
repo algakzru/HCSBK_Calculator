@@ -1,20 +1,21 @@
 package kz.algakzru.hcsbk_calculator;
 
-import java.util.Locale;
-
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.app.AlertDialog;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.Locale;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -98,7 +99,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_formula) {
+            try {
+                View view = LayoutInflater.from(this).inflate(R.layout.dialog_formula, null);
+                new AlertDialog.Builder(this).setTitle("Формула").setView(view).setPositiveButton(android.R.string.ok, null).create().show();
+            } catch (Exception e) {
+                new AlertDialog.Builder(this).setTitle("Ошибка").setMessage(e.getClass().getSimpleName() + " " + e.getMessage()).setNegativeButton(android.R.string.ok, null).show();
+            }
             return true;
         }
 

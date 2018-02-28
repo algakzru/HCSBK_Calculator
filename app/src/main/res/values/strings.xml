@@ -4,7 +4,7 @@
     <string name="title_section1">Кредитный</string>
     <string name="title_section2">Депозитный</string>
 
-    <string name="action_settings">О программе</string>
+    <string name="action_formula">Формула</string>
 
     <string name="dogovornaya_summa">DogovornayaSumma</string>
     <string name="summa_vashih_vznosov">SummaVashihVznosov</string>

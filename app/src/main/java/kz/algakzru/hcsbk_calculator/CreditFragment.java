@@ -6,12 +6,10 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +17,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.Months;
-import org.joda.time.YearMonth;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -318,62 +311,67 @@ public class CreditFragment extends Fragment {
                 throw new Exception("Вы не указали дату первого платежа");
             }
 
-            long raznicaDneiPervogoRaschetnogoPerioda = getRaznicaDneiPervogoRaschetnogoPerioda();
-            BigDecimal procentnayaStavka = new BigDecimal(etProcentnayaStavka.getText().toString()).divide(new BigDecimal(100));
-            BigDecimal procentPervogoRaschetnogoPerioda = new BigDecimal(raznicaDneiPervogoRaschetnogoPerioda).multiply( procentnayaStavka.divide(new BigDecimal(360), 6, BigDecimal.ROUND_HALF_UP) );
+            double procentPervogoRaschetnogoPerioda = getProcentPervogoRaschetnogoPerioda();
+            double procentPoslednegoRaschetnogoPerioda = getProcentPoslednegoRaschetnogoPerioda();
+            double procentEzhemesiachnyi = getProcentEzhemesiachnyi();
+            double up = getUp(procentPervogoRaschetnogoPerioda, procentPoslednegoRaschetnogoPerioda, procentEzhemesiachnyi);
+            double down = getDown(procentPoslednegoRaschetnogoPerioda, procentEzhemesiachnyi);
+            double annuitet = getAnnuitet(up, down);
 
-            long raznicaDneiPoslednegoRaschetnogoPerioda = getRaznicaDneiPoslednegoRaschetnogoPerioda();
-            BigDecimal procentPoslednegoRaschetnogoPerioda = BigDecimal.ZERO;
-            BigDecimal procentEzhemesiachnyi = BigDecimal.ZERO;
-
-            etEzhemesiachnyiPlatezh.setText(String.valueOf(procentPervogoRaschetnogoPerioda));
+            etEzhemesiachnyiPlatezh.setText(String.format("%.2f", annuitet));
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
     }
 
-    private long getRaznicaDneiPervogoRaschetnogoPerioda() throws Exception {
-        Date dataVydachiCredita = sdf.parse(etDataVydachiCredita.getText().toString());
-        Calendar calendarVydachiCredita = Calendar.getInstance();
-        calendarVydachiCredita.setTime(dataVydachiCredita);
-
-        Date dataPervogoPlatezha = sdf.parse(etDataPervogoPlatezha.getText().toString());
-        Calendar calendarPervogoPlatezha = Calendar.getInstance();
-        calendarPervogoPlatezha.setTime(dataPervogoPlatezha);
-
-        // diff in millis
-        long diff = calendarPervogoPlatezha.getTimeInMillis() - calendarVydachiCredita.getTimeInMillis();
-        long days = diff / (24 * 60 * 60 * 1000);
-
-        return days;
+    private double getAnnuitet(double up, double down) throws Exception {
+        double summaCreadita = Double.parseDouble(etSummaCredita.getText().toString());
+        return summaCreadita * up / down;
     }
 
-    private long getRaznicaDneiPoslednegoRaschetnogoPerioda() throws Exception {
-        Date dataVydachiCredita = sdf.parse(etDataVydachiCredita.getText().toString());
-        Calendar calendarVydachiCredita = Calendar.getInstance();
-        calendarVydachiCredita.setTime(dataVydachiCredita);
-        // data zakrytia credita
-        calendarVydachiCredita.add(Calendar.MONTH, Integer.parseInt(etSrokCredita.getText().toString()));
-        long dataZakrytiaCreditaInMillis = calendarVydachiCredita.getTimeInMillis();
-        Log.d("test", sdf.format(calendarVydachiCredita.getTime()));
-
-        Date dataPervogoPlatezha = sdf.parse(etDataPervogoPlatezha.getText().toString());
-        Calendar calendarPervogoPlatezha = Calendar.getInstance();
-        calendarPervogoPlatezha.setTime(dataPervogoPlatezha);
-        // data predposlednego platezha
-        calendarVydachiCredita.add(Calendar.MONTH, -1);
-        calendarVydachiCredita.set(Calendar.DAY_OF_MONTH, calendarPervogoPlatezha.get(Calendar.DAY_OF_MONTH));
-        long dataPredposlednegoPlatezhaInMillis = calendarVydachiCredita.getTimeInMillis();
-        Log.d("test", sdf.format(calendarVydachiCredita.getTime()));
-
-        // diff in millis
-        long diff = dataZakrytiaCreditaInMillis - dataPredposlednegoPlatezhaInMillis;
-        long days = diff / (24 * 60 * 60 * 1000);
-
-        return days;
+    private double getUp(double procentPervogoRaschetnogoPerioda, double procentPoslednegoRaschetnogoPerioda, double procentEzhemesiachnyi) throws Exception {
+        int power = Integer.parseInt(etSrokCredita.getText().toString()) - 2;
+        return (1d + procentPervogoRaschetnogoPerioda) * Math.pow(1d + procentEzhemesiachnyi, power) * (1d + procentPoslednegoRaschetnogoPerioda);
     }
 
-    public double calculateYearFraction(LocalDate firstDate, LocalDate secondDate) {
+    private double getDown(double procentPoslednegoRaschetnogoPerioda, double procentEzhemesiachnyi) throws Exception {
+        double down = 1d;
+        int iMax = Integer.parseInt(etSrokCredita.getText().toString()) - 1;
+        for (int i=1; i <= iMax; i++) {
+            double test = (1d + procentPoslednegoRaschetnogoPerioda) * Math.pow(1d + procentEzhemesiachnyi, i-1);
+            down += test;
+        }
+        return down;
+    }
+
+    private double getProcentPervogoRaschetnogoPerioda() throws Exception {
+        LocalDate firstDate = new LocalDate(etDataVydachiCredita.getText().toString());
+        LocalDate secondDate = new LocalDate(etDataPervogoPlatezha.getText().toString());
+        double yearFraction = calculateYearFraction(firstDate, secondDate);
+        double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d;
+        return yearFraction * procentnayaStavka;
+    }
+
+    private double getProcentPoslednegoRaschetnogoPerioda() throws Exception {
+        LocalDate dataVydachiCredita = new LocalDate(etDataVydachiCredita.getText().toString());
+        LocalDate dataPervogoPlatezha = new LocalDate(etDataPervogoPlatezha.getText().toString());
+        LocalDate firstDate = dataVydachiCredita.plusMonths(Integer.parseInt(etSrokCredita.getText().toString())-1).withDayOfMonth(dataPervogoPlatezha.getDayOfMonth());
+        LocalDate secondDate = dataVydachiCredita.plusMonths(Integer.parseInt(etSrokCredita.getText().toString()));
+        double yearFraction = calculateYearFraction(firstDate, secondDate);
+        double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d;
+
+        return yearFraction * procentnayaStavka;
+    }
+
+    private double getProcentEzhemesiachnyi() throws Exception {
+        double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d;
+        return procentnayaStavka / 12d;
+    }
+
+    // E thirty day months / 360 ("30E/360")
+    // https://stackoverflow.com/questions/28277833/how-to-create-a-bank-calendar-with-30-days-each-month
+    // https://github.com/OpenGamma/OG-Commons/blob/master/modules/basics/src/main/java/com/opengamma/basics/date/StandardDayCounts.java#L266-L284
+    public double calculateYearFraction(LocalDate firstDate, LocalDate secondDate) throws Exception {
         int d1 = firstDate.getDayOfMonth();
         int d2 = secondDate.getDayOfMonth();
         if (d1 == 31) {
@@ -388,28 +386,8 @@ public class CreditFragment extends Fragment {
     }
 
     // calculate using the standard 30/360 function - 360(y2 - y1) + 30(m2 - m1) + (d2 - d1)) / 360
-    private double thirty360(int y1, int m1, int d1, int y2, int m2, int d2) {
+    private double thirty360(int y1, int m1, int d1, int y2, int m2, int d2) throws Exception {
         return (360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)) / 360d;
-    }
-
-    public int calculateDays(Date d1, Date d2) {
-
-        int months = 0;
-        int days = 0;
-
-        months = Months.monthsBetween(new DateTime(d1), new DateTime(d2)).getMonths();
-
-        int endOfMonth = d1.getDate() == 31 ? 31 : 30;
-
-        if(d1.getDate() > d2.getDate()){
-            days = endOfMonth - d1.getDate() + d2.getDate();
-        }else{
-            days = d2.getDate() - d1.getDate();
-        }
-        months = months * 30;
-        days = months + days;
-
-        return days;
     }
 
     @Override
