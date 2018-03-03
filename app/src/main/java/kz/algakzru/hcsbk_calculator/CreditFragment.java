@@ -4,9 +4,13 @@ package kz.algakzru.hcsbk_calculator;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -19,10 +23,17 @@ import android.widget.EditText;
 
 import org.joda.time.LocalDate;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 
 public class CreditFragment extends Fragment {
 
@@ -283,33 +294,90 @@ public class CreditFragment extends Fragment {
         });
     }
 
+    private void validateEditText() throws Exception {
+        if (TextUtils.isEmpty(etSummaCredita.getText().toString())){
+            throw new Exception("Вы не указали сумму кредита");
+        }
+        if (TextUtils.isEmpty(etSrokCredita.getText().toString())){
+            throw new Exception("Вы не указали срок кредита");
+        }
+        if (TextUtils.isEmpty(etProcentnayaStavka.getText().toString())){
+            throw new Exception("Вы не указали процентную ставку");
+        }
+        if (TextUtils.isEmpty(etDataVydachiCredita.getText().toString())){
+            throw new Exception("Вы не указали дату выдачи кредита");
+        }
+        if (TextUtils.isEmpty(etDataPervogoPlatezha.getText().toString())){
+            throw new Exception("Вы не указали дату первого платежа");
+        }
+        LocalDate dataVydachiCredita = new LocalDate(etDataVydachiCredita.getText().toString());
+        LocalDate dataPervogoPlatezha = new LocalDate(etDataPervogoPlatezha.getText().toString());
+        if (dataVydachiCredita.isAfter(dataPervogoPlatezha)){
+            throw new Exception("Дата первого платежа не может быть меньше даты выдачи кредита");
+        }
+    }
+
     private void export() {
         try {
-            if (TextUtils.isEmpty(etEzhemesiachnyiPlatezh.getText().toString())){
-                throw new Exception("Вы не посчитали ежемесячный платёж");
+            validateEditText();
+
+            // File path
+            File path = new File(getActivity().getFilesDir(), "xls");
+            if (!path.exists() && !path.mkdir()){
+                throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + path.getAbsolutePath());
             }
+            File file = new File(path, "annuitet.xls");
+            WorkbookSettings workbookSettings = new WorkbookSettings();
+            workbookSettings.setLocale(new Locale("ru","RU"));
+            WritableWorkbook workbook = Workbook.createWorkbook(file, workbookSettings);
+
+            // Excel sheetA first sheetA
+            WritableSheet writableSheet = workbook.createSheet("Аннуитетный", 0);
+
+            // Column and row titles
+            writableSheet.addCell(new Label(0, 0, "sheet A 1"));
+            writableSheet.addCell(new Label(1, 0, "sheet A 2"));
+            writableSheet.addCell(new Label(0, 1, "sheet A 3"));
+            writableSheet.addCell(new Label(1, 1, "sheet A 4"));
+
+            // close workbook
+            workbook.write();
+            workbook.close();
+
+            Uri uri = FileProvider.getUriForFile(getActivity(), "kz.algakzru.hcsbk_calculator.fileprovider", file);
+            Intent intent = new Intent();
+//            shareIntent.setAction(Intent.ACTION_SEND);
+//            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+//            shareIntent.setType("application/excel");
+//            startActivity(Intent.createChooser(intent, "Открыть с..."));
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri,"application/vnd.ms-excel");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
     }
 
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
     private void calculate() {
         try {
-            if (TextUtils.isEmpty(etSummaCredita.getText().toString())){
-                throw new Exception("Вы не указали сумму кредита");
-            }
-            if (TextUtils.isEmpty(etSrokCredita.getText().toString())){
-                throw new Exception("Вы не указали срок кредита");
-            }
-            if (TextUtils.isEmpty(etProcentnayaStavka.getText().toString())){
-                throw new Exception("Вы не указали процентную ставку");
-            }
-            if (TextUtils.isEmpty(etDataVydachiCredita.getText().toString())){
-                throw new Exception("Вы не указали дату выдачи кредита");
-            }
-            if (TextUtils.isEmpty(etDataPervogoPlatezha.getText().toString())){
-                throw new Exception("Вы не указали дату первого платежа");
-            }
+            etEzhemesiachnyiPlatezh.setText(null);
+            validateEditText();
 
             double procentPervogoRaschetnogoPerioda = getProcentPervogoRaschetnogoPerioda();
             double procentPoslednegoRaschetnogoPerioda = getProcentPoslednegoRaschetnogoPerioda();

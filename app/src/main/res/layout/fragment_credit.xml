@@ -170,12 +170,11 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_clean"
+            android:id="@+id/btn_export"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:text="ОБНУЛИТЬ" />
+            android:text="ЭКСПОРТ В EXCEL" />
 
         <Button
             android:id="@+id/btn_calculate"
@@ -235,11 +234,12 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/btn_export"
+            android:id="@+id/btn_clean"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:text="ЭКСПОРТ В EXCEL" />
+            android:text="ОБНУЛИТЬ" />
 
     </LinearLayout>
 
