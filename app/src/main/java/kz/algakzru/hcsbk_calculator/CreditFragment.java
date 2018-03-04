@@ -4,6 +4,7 @@ package kz.algakzru.hcsbk_calculator;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -321,12 +323,19 @@ public class CreditFragment extends Fragment {
         try {
             validateEditText();
 
-            // File path
-            File path = new File(getActivity().getFilesDir(), "xls");
-            if (!path.exists() && !path.mkdir()){
-                throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + path.getAbsolutePath());
+            if (!isExternalStorageWritable()) {
+                throw new Exception("Внешняя память не доступна");
             }
-            File file = new File(path, "annuitet.xls");
+
+            // Get the directory for the user's public documents directory
+//            File dir = new File(Environment.getExternalStorageDirectory(), "Documents");
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + dir.getAbsolutePath());
+            }
+
+            // Create Workbook
+            final File file = new File(dir, "Annuitet.xls");
             WorkbookSettings workbookSettings = new WorkbookSettings();
             workbookSettings.setLocale(new Locale("ru","RU"));
             WritableWorkbook workbook = Workbook.createWorkbook(file, workbookSettings);
@@ -335,25 +344,34 @@ public class CreditFragment extends Fragment {
             WritableSheet writableSheet = workbook.createSheet("Аннуитетный", 0);
 
             // Column and row titles
-            writableSheet.addCell(new Label(0, 0, "sheet A 1"));
-            writableSheet.addCell(new Label(1, 0, "sheet A 2"));
-            writableSheet.addCell(new Label(0, 1, "sheet A 3"));
-            writableSheet.addCell(new Label(1, 1, "sheet A 4"));
+            writableSheet.addCell(new Label(0, 0, etSummaCredita.getText().toString()));
+            writableSheet.addCell(new Label(1, 0, "Сумма кредита"));
+            writableSheet.addCell(new Label(0, 1, etDataVydachiCredita.getText().toString()));
+            writableSheet.addCell(new Label(1, 1, "Дата выдачи кредита"));
+            writableSheet.addCell(new Label(0, 2, etProcentnayaStavka.getText().toString()));
+            writableSheet.addCell(new Label(1, 2, "% ставка годовая"));
+            writableSheet.addCell(new Label(0, 3, etSrokCredita.getText().toString()));
+            writableSheet.addCell(new Label(1, 3, "Кол-во расчётных периодов (срок кредита)"));
 
-            // close workbook
+            // Close workbook
             workbook.write();
             workbook.close();
 
-            Uri uri = FileProvider.getUriForFile(getActivity(), "kz.algakzru.hcsbk_calculator.fileprovider", file);
-            Intent intent = new Intent();
-//            shareIntent.setAction(Intent.ACTION_SEND);
-//            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-//            shareIntent.setType("application/excel");
-//            startActivity(Intent.createChooser(intent, "Открыть с..."));
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri,"application/vnd.ms-excel");
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(intent);
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(file.getName())
+                    .setMessage("Файл успешно сохранён в папке" + System.getProperty("line.separator") + dir.getAbsolutePath())
+                    .setPositiveButton("Открыть", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Uri uri = FileProvider.getUriForFile(getActivity(), "kz.algakzru.hcsbk_calculator.fileprovider", file);
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setDataAndType(uri,"application/vnd.ms-excel");
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Отмена", null)
+                    .show();
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
@@ -361,14 +379,8 @@ public class CreditFragment extends Fragment {
 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
-        return false;
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
         }
         return false;

@@ -3,7 +3,7 @@
     package="kz.algakzru.hcsbk_calculator" >
 
     <!-- To access external storage: -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
