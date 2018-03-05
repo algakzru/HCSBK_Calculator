@@ -27,13 +27,24 @@ import org.joda.time.LocalDate;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import jxl.Cell;
+import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import jxl.format.Alignment;
+import jxl.write.Formula;
 import jxl.write.Label;
+import jxl.write.Number;
+import jxl.write.NumberFormat;
+import jxl.write.NumberFormats;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 
@@ -45,6 +56,7 @@ public class CreditFragment extends Fragment {
     private EditText etDataVydachiCredita;
     private EditText etDataPervogoPlatezha;
     private EditText etEzhemesiachnyiPlatezh;
+    private EditText etPereplata;
     private Button btnClean;
     private Button btnCalculate;
     private Button btnExport;
@@ -74,11 +86,11 @@ public class CreditFragment extends Fragment {
         etDataVydachiCredita = (EditText) view.findViewById(R.id.et_data_vydachi_credita);
         etDataPervogoPlatezha = (EditText) view.findViewById(R.id.et_data_pervogo_platezha);
         etEzhemesiachnyiPlatezh = (EditText) view.findViewById(R.id.et_ezhemesiachnyi_platezh);
+        etPereplata = (EditText) view.findViewById(R.id.et_pereplata);
         btnClean = (Button) view.findViewById(R.id.btn_clean);
         btnCalculate = (Button) view.findViewById(R.id.btn_calculate);
         btnExport = (Button) view.findViewById(R.id.btn_export);
 
-//        setHint();
         setText();
         setListeners();
 
@@ -106,6 +118,7 @@ public class CreditFragment extends Fragment {
         etDataVydachiCredita.setText(null);
         etDataPervogoPlatezha.setText(null);
         etEzhemesiachnyiPlatezh.setText(null);
+        etPereplata.setText(null);
     }
 
     private void setListeners() {
@@ -343,15 +356,49 @@ public class CreditFragment extends Fragment {
             // Excel sheetA first sheetA
             WritableSheet writableSheet = workbook.createSheet("Аннуитетный", 0);
 
+            // Create a bold font
+            WritableFont times10ptBold = new WritableFont(WritableFont.TIMES, 10, WritableFont.BOLD);
+            WritableCellFormat timesBold = new WritableCellFormat(times10ptBold);
+
+            // Create a center alignment
+            WritableCellFormat alignmentCentre = new WritableCellFormat();
+            alignmentCentre.setAlignment(Alignment.CENTRE);
+
+            WritableCellFormat accountFloat = new WritableCellFormat(NumberFormats.ACCOUNTING_FLOAT);
+            accountFloat.setAlignment(Alignment.CENTRE);
+
+            WritableCellFormat percentFloat = new WritableCellFormat(NumberFormats.PERCENT_FLOAT);
+            percentFloat.setAlignment(Alignment.CENTRE);
+
             // Column and row titles
-            writableSheet.addCell(new Label(0, 0, etSummaCredita.getText().toString()));
-            writableSheet.addCell(new Label(1, 0, "Сумма кредита"));
-            writableSheet.addCell(new Label(0, 1, etDataVydachiCredita.getText().toString()));
-            writableSheet.addCell(new Label(1, 1, "Дата выдачи кредита"));
-            writableSheet.addCell(new Label(0, 2, etProcentnayaStavka.getText().toString()));
-            writableSheet.addCell(new Label(1, 2, "% ставка годовая"));
-            writableSheet.addCell(new Label(0, 3, etSrokCredita.getText().toString()));
-            writableSheet.addCell(new Label(1, 3, "Кол-во расчётных периодов (срок кредита)"));
+            writableSheet.addCell(new Label(0, 0, "Исходные значения:", timesBold));
+            writableSheet.addCell(new Number(0, 1, Double.parseDouble(etSummaCredita.getText().toString()), alignmentCentre));
+            writableSheet.addCell(new Label(1, 1, "Сумма кредита"));
+            writableSheet.addCell(new Number(0, 2, Double.parseDouble(etSrokCredita.getText().toString()), alignmentCentre));
+            writableSheet.addCell(new Label(1, 2, "Кол-во расчётных периодов (срок кредита)"));
+            writableSheet.addCell(new Label(0, 3, etProcentnayaStavka.getText().toString(), percentFloat));
+            writableSheet.addCell(new Label(1, 3, "Процентная ставка годовая"));
+            writableSheet.addCell(new Label(0, 4, etDataVydachiCredita.getText().toString(), alignmentCentre));
+            writableSheet.addCell(new Label(1, 4, "Дата выдачи кредита"));
+            writableSheet.addCell(new Label(0, 5, etDataPervogoPlatezha.getText().toString(), alignmentCentre));
+            writableSheet.addCell(new Label(1, 5, "Дата первого платежа"));
+
+            writableSheet.addCell(new Label(0, 7, "Процентная ставка месячная:", timesBold));
+            writableSheet.addCell(new Label(0, 8, "0.00058", percentFloat));
+            writableSheet.addCell(new Label(1, 8, "Процентная ставка в первом расчётном периоде"));
+            writableSheet.addCell(new Label(0, 9, "0.00642", percentFloat));
+            writableSheet.addCell(new Label(1, 9, "Процентная ставка в последнем расчётном периоде"));
+            writableSheet.addCell(new Label(0, 10, "0.00350", percentFloat));
+            writableSheet.addCell(new Label(1, 10, "Процентная ставка в остальных расчётных периодах"));
+
+            writableSheet.addCell(new Label(0, 12, "Итоговые значения:", timesBold));
+            writableSheet.addCell(new Number(0, 13, Double.parseDouble("94066.96"), alignmentCentre));
+            writableSheet.addCell(new Label(1, 13, "Ежемесячный платёж"));
+            writableSheet.addCell(new Formula(0, 14, "a14*a3-a2s", accountFloat));
+            writableSheet.addCell(new Label(1, 14, "Переплата"));
+
+            // CellView Auto-Size
+            sheetAutoFitColumns(writableSheet);
 
             // Close workbook
             workbook.write();
@@ -363,11 +410,15 @@ public class CreditFragment extends Fragment {
                     .setPositiveButton("Открыть", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Uri uri = FileProvider.getUriForFile(getActivity(), "kz.algakzru.hcsbk_calculator.fileprovider", file);
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setDataAndType(uri,"application/vnd.ms-excel");
-                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            startActivity(intent);
+                            try {
+                                Uri uri = FileProvider.getUriForFile(getActivity(), "kz.algakzru.hcsbk_calculator.fileprovider", file);
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setDataAndType(uri,"application/vnd.ms-excel");
+                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
+                            }
                         }
                     })
                     .setNegativeButton("Отмена", null)
@@ -375,6 +426,41 @@ public class CreditFragment extends Fragment {
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
+    }
+
+    private void sheetAutoFitColumns(WritableSheet writableSheet) throws Exception {
+
+        List<Cell> listCell = new ArrayList<>();
+        listCell.add(writableSheet.getCell(0, 1));
+        listCell.add(writableSheet.getCell(0, 2));
+        listCell.add(writableSheet.getCell(0, 3));
+        listCell.add(writableSheet.getCell(0, 4));
+        listCell.add(writableSheet.getCell(0, 5));
+        listCell.add(writableSheet.getCell(0, 8));
+        listCell.add(writableSheet.getCell(0, 9));
+        listCell.add(writableSheet.getCell(0, 10));
+        listCell.add(writableSheet.getCell(0, 13));
+        listCell.add(writableSheet.getCell(0, 14));
+
+        /* Find the widest cell in the column. */
+        int longestStrLen = -1;
+        for (int j = 0; j < listCell.size(); j++) {
+            if ( listCell.get(j).getContents().length() > longestStrLen ) {
+                String str = listCell.get(j).getContents();
+                if (TextUtils.isEmpty(str)) continue;
+                longestStrLen = str.trim().length();
+            }
+        }
+
+        /* If not found, skip the column. */
+        if (longestStrLen == -1) return;
+
+        /* If wider than the max width, crop width */
+        if (longestStrLen > 255) longestStrLen = 255;
+
+        CellView cv = writableSheet.getColumnView(0);
+        cv.setSize(longestStrLen * 256 + 100); /* Every character is 256 units wide, so scale it. */
+        writableSheet.setColumnView(0, cv);
     }
 
     /* Checks if external storage is available for read and write */
@@ -389,6 +475,7 @@ public class CreditFragment extends Fragment {
     private void calculate() {
         try {
             etEzhemesiachnyiPlatezh.setText(null);
+            etPereplata.setText(null);
             validateEditText();
 
             double procentPervogoRaschetnogoPerioda = getProcentPervogoRaschetnogoPerioda();
@@ -397,11 +484,19 @@ public class CreditFragment extends Fragment {
             double up = getUp(procentPervogoRaschetnogoPerioda, procentPoslednegoRaschetnogoPerioda, procentEzhemesiachnyi);
             double down = getDown(procentPoslednegoRaschetnogoPerioda, procentEzhemesiachnyi);
             double annuitet = getAnnuitet(up, down);
+            double pereplata = getPereplata(annuitet);
 
             etEzhemesiachnyiPlatezh.setText(String.format("%.2f", annuitet));
+            etPereplata.setText(String.format("%.2f", pereplata));
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
+    }
+
+    private double getPereplata(double annuitet) throws Exception {
+        double summaCreadita = Double.parseDouble(etSummaCredita.getText().toString());
+        double srokCredita = Double.parseDouble(etSrokCredita.getText().toString());
+        return (annuitet * srokCredita) - summaCreadita;
     }
 
     private double getAnnuitet(double up, double down) throws Exception {
