@@ -332,6 +332,7 @@ public class CreditFragment extends Fragment {
         }
     }
 
+    // http://www.docjar.com/html/api/jxl/demo/Write.java.html
     private void export() {
         try {
             validateEditText();
@@ -372,11 +373,11 @@ public class CreditFragment extends Fragment {
 
             // Column and row titles
             writableSheet.addCell(new Label(0, 0, "Исходные значения:", timesBold));
-            writableSheet.addCell(new Number(0, 1, Double.parseDouble(etSummaCredita.getText().toString()), alignmentCentre));
+            writableSheet.addCell(new Number(0, 1, Double.parseDouble(etSummaCredita.getText().toString()), accountFloat));
             writableSheet.addCell(new Label(1, 1, "Сумма кредита"));
             writableSheet.addCell(new Number(0, 2, Double.parseDouble(etSrokCredita.getText().toString()), alignmentCentre));
             writableSheet.addCell(new Label(1, 2, "Кол-во расчётных периодов (срок кредита)"));
-            writableSheet.addCell(new Label(0, 3, etProcentnayaStavka.getText().toString(), percentFloat));
+            writableSheet.addCell(new Number(0, 3, Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d, percentFloat));
             writableSheet.addCell(new Label(1, 3, "Процентная ставка годовая"));
             writableSheet.addCell(new Label(0, 4, etDataVydachiCredita.getText().toString(), alignmentCentre));
             writableSheet.addCell(new Label(1, 4, "Дата выдачи кредита"));
@@ -384,17 +385,17 @@ public class CreditFragment extends Fragment {
             writableSheet.addCell(new Label(1, 5, "Дата первого платежа"));
 
             writableSheet.addCell(new Label(0, 7, "Процентная ставка месячная:", timesBold));
-            writableSheet.addCell(new Label(0, 8, "0.00058", percentFloat));
+            writableSheet.addCell(new Number(0, 8, Double.parseDouble("0.00058"), percentFloat));
             writableSheet.addCell(new Label(1, 8, "Процентная ставка в первом расчётном периоде"));
-            writableSheet.addCell(new Label(0, 9, "0.00642", percentFloat));
+            writableSheet.addCell(new Number(0, 9, Double.parseDouble("0.00642"), percentFloat));
             writableSheet.addCell(new Label(1, 9, "Процентная ставка в последнем расчётном периоде"));
-            writableSheet.addCell(new Label(0, 10, "0.00350", percentFloat));
+            writableSheet.addCell(new Number(0, 10, Double.parseDouble("0.00350"), percentFloat));
             writableSheet.addCell(new Label(1, 10, "Процентная ставка в остальных расчётных периодах"));
 
             writableSheet.addCell(new Label(0, 12, "Итоговые значения:", timesBold));
-            writableSheet.addCell(new Number(0, 13, Double.parseDouble("94066.96"), alignmentCentre));
+            writableSheet.addCell(new Number(0, 13, Double.parseDouble("94066.96"), accountFloat));
             writableSheet.addCell(new Label(1, 13, "Ежемесячный платёж"));
-            writableSheet.addCell(new Formula(0, 14, "a14*a3-a2s", accountFloat));
+            writableSheet.addCell(new Formula(0, 14, "a14*a3-a2", accountFloat));
             writableSheet.addCell(new Label(1, 14, "Переплата"));
 
             // CellView Auto-Size
