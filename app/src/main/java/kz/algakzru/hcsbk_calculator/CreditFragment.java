@@ -39,6 +39,8 @@ import jxl.CellType;
 import jxl.CellView;
 import jxl.DateCell;
 import jxl.NumberCell;
+import jxl.NumberFormulaCell;
+import jxl.Sheet;
 import jxl.SheetSettings;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -58,6 +60,7 @@ import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
+import jxl.write.biff.FormulaRecord;
 
 public class CreditFragment extends Fragment {
 
@@ -361,6 +364,8 @@ public class CreditFragment extends Fragment {
                 throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + dir.getAbsolutePath());
             }
 
+            test(new File(dir, "Annuitet1.xls"));
+
             // Create Workbook
             final File file = new File(dir, "Annuitet.xls");
             WorkbookSettings workbookSettings = new WorkbookSettings();
@@ -393,14 +398,6 @@ public class CreditFragment extends Fragment {
             WritableCellFormat borderFormat = new WritableCellFormat();
             borderFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
 
-            // Create a bold font
-            WritableCellFormat blueTitle = new WritableCellFormat();
-            blueTitle.setAlignment(Alignment.CENTRE);
-            blueTitle.setVerticalAlignment(VerticalAlignment.CENTRE);
-            blueTitle.setBorder(Border.ALL, BorderLineStyle.THIN);
-            blueTitle.setBackground(Colour.YELLOW);
-            blueTitle.setWrap(true);
-
             // Column and row titles
             sheetAnnuitet.addCell(new Number(0, 0, Double.parseDouble(etSummaCredita.getText().toString()), euroSuffixFormat));
             sheetAnnuitet.addCell(new Label(1, 0, "Сумма кредита", borderFormat));
@@ -424,21 +421,18 @@ public class CreditFragment extends Fragment {
             sheetCalculate.addCell(new Number(0, 2, Double.parseDouble("0.00350"), percentFloat));
             sheetCalculate.addCell(new Label(1, 2, "Процентная ставка в остальных расчётных периодах", borderFormat));
 
-            sheetCalculate.mergeCells(0, 8, 0, 9);
-            sheetCalculate.mergeCells(1, 8, 1, 9);
-            sheetCalculate.addCell(new Label(0, 8, "Расчётный период", blueTitle));
-            sheetCalculate.addCell(new Label(1, 8, "Дата погашения", blueTitle));
+            addTitles(sheetCalculate);
             for (int i=0; i < Integer.parseInt(etSrokCredita.getText().toString()); i++) {
-                sheetCalculate.addCell(new Number(0, 10+i, i+1, alignmentCentre));
+                if (i < Integer.parseInt(etSrokCredita.getText().toString()) - 1) {
+                    sheetCalculate.addCell(new Number(0, 10+i, i+1, alignmentCentre));
+                }
                 if (i == 0) {
-                    sheetCalculate.addCell(new DateTime(1, 10+i, sdf.parse(etDataPervogoPlatezha.getText().toString()), dateFormat));
+                    sheetCalculate.addCell(new Formula(1, 10+i, "'Аннуитет'!A5", dateFormat));
                 } else {
                     sheetCalculate.addCell(new Formula(1, 10+i, "DATE(YEAR(B11), MONTH(B11) + " + i + ", DAY(B11))", dateFormat));
+                    sheetCalculate.addCell(new FormulaRecord(2, 10+i, "DAYS360(B11,B12)"));
                 }
             }
-
-            autoSize(sheetCalculate, 0, "Расчётный");
-            autoSize(sheetCalculate, 1, "погашения");
 
             // CellView Auto-Size
             sheetAutoFitColumns(sheetAnnuitet);
@@ -472,6 +466,40 @@ public class CreditFragment extends Fragment {
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
+    }
+
+    private void test(File file) throws Exception {
+        Workbook workbook = Workbook.getWorkbook(file);
+        Sheet sheet = workbook.getSheet(1);
+        Cell cell = sheet.getCell(2, 11);
+        if (CellType.NUMBER_FORMULA == cell.getType()) {
+            NumberFormulaCell numberCell = (NumberFormulaCell) cell;
+            String str = numberCell.getFormula().toString();
+            Log.d("test", str);
+        }
+        Log.d("test", cell.getContents());
+        Log.d("test", cell.getType().toString());
+    }
+
+    private void addTitles(WritableSheet writableSheet) throws Exception {
+
+        // Create a bold font
+        WritableCellFormat titleFormat = new WritableCellFormat();
+        titleFormat.setAlignment(Alignment.CENTRE);
+        titleFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+        titleFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
+        titleFormat.setBackground(Colour.PALE_BLUE);
+        titleFormat.setWrap(true);
+
+        writableSheet.mergeCells(0, 8, 0, 9);
+        writableSheet.mergeCells(1, 8, 1, 9);
+        writableSheet.mergeCells(2, 8, 2, 9);
+        writableSheet.addCell(new Label(0, 8, "Расчётный период", titleFormat));
+        writableSheet.addCell(new Label(1, 8, "Дата погашения", titleFormat));
+        writableSheet.addCell(new Label(2, 8, "Колличество дней", titleFormat));
+        autoSize(writableSheet, 0, "Расчётный");
+        autoSize(writableSheet, 1, "погашения");
+        autoSize(writableSheet, 2, "Колличество");
     }
 
     private void sheetAutoFitColumns(WritableSheet writableSheet) throws Exception {
