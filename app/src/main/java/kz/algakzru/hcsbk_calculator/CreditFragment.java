@@ -44,6 +44,7 @@ import jxl.Sheet;
 import jxl.SheetSettings;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import jxl.biff.formula.FunctionNames;
 import jxl.format.Alignment;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
@@ -364,11 +365,24 @@ public class CreditFragment extends Fragment {
                 throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + dir.getAbsolutePath());
             }
 
-            test(new File(dir, "Annuitet1.xls"));
+//            test(new File(dir, "Annuitet1.xls"));
 
             // Create Workbook
             final File file = new File(dir, "Annuitet.xls");
-            WorkbookSettings workbookSettings = new WorkbookSettings();
+
+            FunctionNames functionNames = new FunctionNames(new Locale("ru","RU"));
+            WritableWorkbook workbook = Workbook.createWorkbook(file);
+            WritableSheet sheet = workbook.createSheet("Sheet 1", 0);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            WritableCellFormat dateFormat = new WritableCellFormat(new DateFormat("yyyy-MM-dd"));
+            sheet.addCell(new DateTime(0, 0, sdf.parse("2017-09-28"), dateFormat));
+            sheet.addCell(new DateTime(0, 1, sdf.parse("2017-10-03"), dateFormat));
+            sheet.addCell(new Formula(0, 2, "DAYS\3\6\0(A1,A2)"));
+//            sheet.addCell(new Formula(0, 2, "NOW()"));
+            workbook.write();
+            workbook.close();
+
+            /*WorkbookSettings workbookSettings = new WorkbookSettings();
             workbookSettings.setLocale(new Locale("ru","RU"));
             WritableWorkbook workbook = Workbook.createWorkbook(file, workbookSettings);
 
@@ -442,7 +456,7 @@ public class CreditFragment extends Fragment {
 
             // Close workbook
             workbook.write();
-            workbook.close();
+            workbook.close();*/
 
             new AlertDialog.Builder(getActivity())
                     .setTitle(file.getName())
