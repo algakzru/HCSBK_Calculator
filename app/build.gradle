@@ -25,5 +25,5 @@ dependencies {
     compile 'com.android.support:support-v4:22.0.0'
 //    compile 'com.google.android.gms:play-services:7.5.0'
     compile 'joda-time:joda-time:2.9.9'
-    compile group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
+//    compile group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
 }
