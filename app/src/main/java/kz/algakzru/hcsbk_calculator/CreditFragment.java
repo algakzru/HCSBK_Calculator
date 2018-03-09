@@ -3,6 +3,7 @@ package kz.algakzru.hcsbk_calculator;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,10 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,12 +37,8 @@ import jxl.CellType;
 import jxl.CellView;
 import jxl.DateCell;
 import jxl.NumberCell;
-import jxl.NumberFormulaCell;
-import jxl.Sheet;
-import jxl.SheetSettings;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import jxl.biff.formula.FunctionNames;
 import jxl.format.Alignment;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
@@ -58,10 +52,10 @@ import jxl.write.Number;
 import jxl.write.NumberFormat;
 import jxl.write.NumberFormats;
 import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
-import jxl.write.biff.FormulaRecord;
+import kz.algakzru.hcsbk_calculator.utils.CustomTextWatcher;
+import kz.algakzru.hcsbk_calculator.utils.NumberTextWatcherForThousand;
 
 public class CreditFragment extends Fragment {
 
@@ -106,106 +100,36 @@ public class CreditFragment extends Fragment {
         btnCalculate = (Button) view.findViewById(R.id.btn_calculate);
         btnExport = (Button) view.findViewById(R.id.btn_export);
 
-        setText();
         setListeners();
+        setText();
 
         return view;
     }
 
     private void setText() {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        etSummaCredita.setText(sharedPref.getString(getString(R.string.summa_credita), ""));
-        etSrokCredita.setText(sharedPref.getString(getString(R.string.srok_credita), ""));
-        etProcentnayaStavka.setText(sharedPref.getString(getString(R.string.procentnaya_stavka), ""));
-        etDataVydachiCredita.setText(sharedPref.getString(getString(R.string.data_vydachi_credita), ""));
-        etDataPervogoPlatezha.setText(sharedPref.getString(getString(R.string.data_pervogo_platezha), ""));
+        etSummaCredita.setText(sharedPref.getString((String) etSummaCredita.getTag(), ""));
+        etSrokCredita.setText(sharedPref.getString((String) etSrokCredita.getTag(), ""));
+        etProcentnayaStavka.setText(sharedPref.getString((String) etProcentnayaStavka.getTag(), ""));
+        etDataVydachiCredita.setText(sharedPref.getString((String) etDataVydachiCredita.getTag(), ""));
+        etDataPervogoPlatezha.setText(sharedPref.getString((String) etDataPervogoPlatezha.getTag(), ""));
     }
 
     private void setListeners() {
 
-        etSummaCredita.addTextChangedListener(new TextWatcher() {
+        etSummaCredita.addTextChangedListener(new NumberTextWatcherForThousand(etSummaCredita, this));
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        etSrokCredita.addTextChangedListener(new CustomTextWatcher(etSrokCredita, this));
 
-            }
+        etProcentnayaStavka.addTextChangedListener(new CustomTextWatcher(etProcentnayaStavka, this));
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+        etDataVydachiCredita.addTextChangedListener(new CustomTextWatcher(etDataVydachiCredita, this));
 
-            }
+        etDataPervogoPlatezha.addTextChangedListener(new CustomTextWatcher(etDataPervogoPlatezha, this));
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.summa_credita), s.toString());
-                editor.commit();
-            }
-        });
+        etEzhemesiachnyiPlatezh.addTextChangedListener(new NumberTextWatcherForThousand(etEzhemesiachnyiPlatezh, this));
 
-        etSrokCredita.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.srok_credita), s.toString());
-                editor.commit();
-            }
-        });
-
-        etProcentnayaStavka.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.procentnaya_stavka), s.toString());
-                editor.commit();
-            }
-        });
-
-        etDataVydachiCredita.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.data_vydachi_credita), s.toString());
-                editor.commit();
-            }
-        });
+        etPereplata.addTextChangedListener(new NumberTextWatcherForThousand(etPereplata, this));
 
         etDataVydachiCredita.setOnClickListener(new View.OnClickListener() {
 
@@ -232,27 +156,6 @@ public class CreditFragment extends Fragment {
                 } catch (Exception e) {
                     new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
                 }
-            }
-        });
-
-        etDataPervogoPlatezha.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.data_pervogo_platezha), s.toString());
-                editor.commit();
             }
         });
 
@@ -302,7 +205,7 @@ public class CreditFragment extends Fragment {
     }
 
     private void validateEditText() throws Exception {
-        if (TextUtils.isEmpty(etSummaCredita.getText().toString())){
+        if (TextUtils.isEmpty(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()))){
             throw new Exception("Вы не указали сумму кредита");
         }
         if (TextUtils.isEmpty(etSrokCredita.getText().toString())){
@@ -344,7 +247,7 @@ public class CreditFragment extends Fragment {
             }
 
             // Get the directory for the user's public documents directory
-            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            File dir = new File(Environment.getExternalStorageDirectory(), "Documents");
             if (!dir.exists() && !dir.mkdirs()) {
                 throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + dir.getAbsolutePath());
             }
@@ -397,7 +300,7 @@ public class CreditFragment extends Fragment {
             dateFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
 
             // Column and row titles
-            paramsSheet.addCell(new Number(0, 0, Double.parseDouble(etSummaCredita.getText().toString()), tengeFormat));
+            paramsSheet.addCell(new Number(0, 0, Double.parseDouble(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString())), tengeFormat));
             paramsSheet.addCell(new Label(1, 0, "Сумма кредита", borderFormat));
             paramsSheet.addCell(new Number(0, 1, Double.parseDouble(etSrokCredita.getText().toString()), centreFromat));
             paramsSheet.addCell(new Label(1, 1, "Кол-во расчётных периодов (срок кредита)", borderFormat));
@@ -479,6 +382,8 @@ public class CreditFragment extends Fragment {
                                 intent.setDataAndType(uri,"application/vnd.ms-excel");
                                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 startActivity(intent);
+                            } catch (ActivityNotFoundException e) {
+                                new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage("На вашем устройстве не установлен Excel редактор").setNegativeButton("OK", null).show();
                             } catch (Exception e) {
                                 new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
                             }
@@ -596,21 +501,21 @@ public class CreditFragment extends Fragment {
             double annuitet = getAnnuitet(up, down);
             double pereplata = getPereplata(annuitet);
 
-            etEzhemesiachnyiPlatezh.setText(String.format("%.2f", annuitet));
-            etPereplata.setText(String.format("%.2f", pereplata));
+            etEzhemesiachnyiPlatezh.setText(String.format(Locale.US, "%.2f", annuitet));
+            etPereplata.setText(String.format(Locale.US, "%.2f", pereplata));
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
     }
 
     private double getPereplata(double annuitet) throws Exception {
-        double summaCreadita = Double.parseDouble(etSummaCredita.getText().toString());
+        double summaCreadita = Double.parseDouble(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()));
         double srokCredita = Double.parseDouble(etSrokCredita.getText().toString());
         return (annuitet * srokCredita) - summaCreadita;
     }
 
     private double getAnnuitet(double up, double down) throws Exception {
-        double summaCreadita = Double.parseDouble(etSummaCredita.getText().toString());
+        double summaCreadita = Double.parseDouble(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()));
         return summaCreadita * up / down;
     }
 
@@ -640,7 +545,7 @@ public class CreditFragment extends Fragment {
     private double getProcentPoslednegoRaschetnogoPerioda() throws Exception {
         LocalDate dataVydachiCredita = new LocalDate(etDataVydachiCredita.getText().toString());
         LocalDate dataPervogoPlatezha = new LocalDate(etDataPervogoPlatezha.getText().toString());
-        LocalDate firstDate = dataVydachiCredita.plusMonths(Integer.parseInt(etSrokCredita.getText().toString())-1).withDayOfMonth(dataPervogoPlatezha.getDayOfMonth());
+        LocalDate firstDate = dataPervogoPlatezha.plusMonths(Integer.parseInt(etSrokCredita.getText().toString())-2);
         LocalDate secondDate = dataVydachiCredita.plusMonths(Integer.parseInt(etSrokCredita.getText().toString()));
         double yearFraction = calculateYearFraction(firstDate, secondDate);
         double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d;

@@ -30,8 +30,8 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="right"
-                android:hint="0.00"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:tag="@string/summa_credita" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -67,8 +67,8 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="right"
-                android:hint="0"
-                android:inputType="number" />
+                android:inputType="number"
+                android:tag="@string/srok_credita" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -103,8 +103,8 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="right"
-                android:hint="0.00"
-                android:inputType="numberDecimal"  />
+                android:inputType="numberDecimal"
+                android:tag="@string/procentnaya_stavka" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -135,7 +135,8 @@
             android:ems="10"
             android:focusable="false"
             android:gravity="right"
-            android:inputType="none"/>
+            android:inputType="none"
+            android:tag="@string/data_vydachi_credita" />
 
     </LinearLayout>
 
@@ -160,7 +161,8 @@
             android:ems="10"
             android:focusable="false"
             android:gravity="right"
-            android:inputType="none"/>
+            android:inputType="none"
+            android:tag="@string/data_pervogo_platezha" />
 
     </LinearLayout>
 
@@ -212,7 +214,6 @@
                 android:ems="10"
                 android:enabled="false"
                 android:gravity="right"
-                android:hint="0.00"
                 android:inputType="numberDecimal" />
 
             <TextView
@@ -249,7 +250,6 @@
                 android:ems="10"
                 android:enabled="false"
                 android:gravity="right"
-                android:hint="0.00"
                 android:inputType="numberDecimal" />
 
             <TextView
