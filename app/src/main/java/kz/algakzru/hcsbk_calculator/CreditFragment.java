@@ -72,7 +72,6 @@ public class CreditFragment extends Fragment {
     private EditText etDataPervogoPlatezha;
     private EditText etEzhemesiachnyiPlatezh;
     private EditText etPereplata;
-    private Button btnClean;
     private Button btnCalculate;
     private Button btnExport;
 
@@ -104,7 +103,6 @@ public class CreditFragment extends Fragment {
         etDataPervogoPlatezha = (EditText) view.findViewById(R.id.et_data_pervogo_platezha);
         etEzhemesiachnyiPlatezh = (EditText) view.findViewById(R.id.et_ezhemesiachnyi_platezh);
         etPereplata = (EditText) view.findViewById(R.id.et_pereplata);
-        btnClean = (Button) view.findViewById(R.id.btn_clean);
         btnCalculate = (Button) view.findViewById(R.id.btn_calculate);
         btnExport = (Button) view.findViewById(R.id.btn_export);
 
@@ -114,11 +112,6 @@ public class CreditFragment extends Fragment {
         return view;
     }
 
-    private void setHint() {
-        etDataVydachiCredita.setHint(sdf.format(calendar.getTime()));
-        etDataPervogoPlatezha.setHint(sdf.format(calendar.getTime()));
-    }
-
     private void setText() {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         etSummaCredita.setText(sharedPref.getString(getString(R.string.summa_credita), ""));
@@ -126,16 +119,6 @@ public class CreditFragment extends Fragment {
         etProcentnayaStavka.setText(sharedPref.getString(getString(R.string.procentnaya_stavka), ""));
         etDataVydachiCredita.setText(sharedPref.getString(getString(R.string.data_vydachi_credita), ""));
         etDataPervogoPlatezha.setText(sharedPref.getString(getString(R.string.data_pervogo_platezha), ""));
-    }
-
-    private void resetText() {
-        etSummaCredita.setText(null);
-        etSrokCredita.setText(null);
-        etProcentnayaStavka.setText(null);
-        etDataVydachiCredita.setText(null);
-        etDataPervogoPlatezha.setText(null);
-        etEzhemesiachnyiPlatezh.setText(null);
-        etPereplata.setText(null);
     }
 
     private void setListeners() {
@@ -301,14 +284,6 @@ public class CreditFragment extends Fragment {
             }
         });
 
-        btnClean.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                resetText();
-            }
-        });
-
         btnCalculate.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -369,17 +344,14 @@ public class CreditFragment extends Fragment {
             }
 
             // Get the directory for the user's public documents directory
-//            File dir = new File(Environment.getExternalStorageDirectory(), "Documents");
             File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
             if (!dir.exists() && !dir.mkdirs()) {
                 throw new Exception("Не удалось создать папку" + System.getProperty("line.separator") + dir.getAbsolutePath());
             }
 
-//            test(new File(dir, "Annuitet1.xls"));
+            final File file = new File(dir, getString(R.string.title_section1) + ".xls");
 
             // Create Workbook
-            final File file = new File(dir, "Annuitet.xls");
-
             WorkbookSettings workbookSettings = new WorkbookSettings();
             workbookSettings.setLocale(new Locale("ru","RU"));
             WritableWorkbook workbook = Workbook.createWorkbook(file, workbookSettings);
@@ -435,23 +407,24 @@ public class CreditFragment extends Fragment {
             paramsSheet.addCell(new Label(1, 3, "Дата выдачи кредита", borderFormat));
             paramsSheet.addCell(new DateTime(0, 4, sdf.parse(etDataPervogoPlatezha.getText().toString()), dateFormat));
             paramsSheet.addCell(new Label(1, 4, "Дата первого платежа", borderFormat));
-            paramsSheet.addCell(new Formula(0, 5, "'Вычесление'!A4", greenTengeFormat));
-            paramsSheet.addCell(new Label(1, 5, "Ежемесячный платёж", borderFormat));
-            paramsSheet.addCell(new Formula(0, 6, "'Вычесление'!A5", yellowTengeFormat));
-            paramsSheet.addCell(new Label(1, 6, "Переплата", borderFormat));
 
             int firstRow = 11;
             int srokCredita = Integer.parseInt(etSrokCredita.getText().toString());
-            calculateSheet.addCell(new Formula(0, 0, "'Параметры'!A3*F" + firstRow + "/360", percentFormat));
-            calculateSheet.addCell(new Label(1, 0, "Процентная ставка в первом расчётном периоде"));
-            calculateSheet.addCell(new Formula(0, 1, "'Параметры'!A3*F" + (firstRow+srokCredita-1) + "/360", percentFormat));
-            calculateSheet.addCell(new Label(1, 1, "Процентная ставка в последнем расчётном периоде"));
-            calculateSheet.addCell(new Formula(0, 2, "'Параметры'!A3/12", percentFormat));
-            calculateSheet.addCell(new Label(1, 2, "Процентная ставка в остальных расчётных периодах"));
-            calculateSheet.addCell(new Formula(0, 3, "'Параметры'!A1*((1+A1)*(1+A2)*POWER(1+A3,'Параметры'!A2-2))/(1+SUM(G" + firstRow + ":G" + (firstRow+srokCredita-1) + "))", greenTengeFormat));
-            calculateSheet.addCell(new Label(1, 3, "Ежемесячный платёж"));
-            calculateSheet.addCell(new Formula(0, 4, "SUM(C" + firstRow + ":C" + (firstRow+srokCredita-1) + ")", yellowTengeFormat));
-            calculateSheet.addCell(new Label(1, 4, "Переплата"));
+            calculateSheet.mergeCells(1, 0, 6, 0);
+            calculateSheet.mergeCells(1, 1, 6, 1);
+            calculateSheet.mergeCells(1, 2, 6, 2);
+            calculateSheet.mergeCells(1, 3, 6, 3);
+            calculateSheet.mergeCells(1, 4, 6, 4);
+            calculateSheet.addCell(new Formula(0, 0, "'Параметры'!A1*((1+A3)*(1+A4)*POWER(1+A5,'Параметры'!A2-2))/(1+SUM(G" + firstRow + ":G" + (firstRow+srokCredita-1) + "))", greenTengeFormat));
+            calculateSheet.addCell(new Label(1, 0, "Ежемесячный платёж", borderFormat));
+            calculateSheet.addCell(new Formula(0, 1, "SUM(C" + firstRow + ":C" + (firstRow+srokCredita-1) + ")", yellowTengeFormat));
+            calculateSheet.addCell(new Label(1, 1, "Переплата", borderFormat));
+            calculateSheet.addCell(new Formula(0, 2, "'Параметры'!A3*F" + firstRow + "/360", percentFormat));
+            calculateSheet.addCell(new Label(1, 2, "Процентная ставка в первом расчётном периоде", borderFormat));
+            calculateSheet.addCell(new Formula(0, 3, "'Параметры'!A3*F" + (firstRow+srokCredita-1) + "/360", percentFormat));
+            calculateSheet.addCell(new Label(1, 3, "Процентная ставка в последнем расчётном периоде", borderFormat));
+            calculateSheet.addCell(new Formula(0, 4, "'Параметры'!A3/12", percentFormat));
+            calculateSheet.addCell(new Label(1, 4, "Процентная ставка в остальных расчётных периодах", borderFormat));
 
             addTitles(calculateSheet, firstRow);
             for (int i=1; i <= srokCredita; i++) {
@@ -462,7 +435,7 @@ public class CreditFragment extends Fragment {
                     calculateSheet.addCell(new Formula(1, currentRow, "'Параметры'!A5", dateFormat));
                     calculateSheet.addCell(new Formula(4, currentRow, "'Параметры'!A1", tengeFormat));
                     calculateSheet.addCell(new Formula(5, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5)", centreFromat));
-                    calculateSheet.addCell(new Formula(6, currentRow, "(1+A2)*POWER(1+A3, A" + (firstRow - 1 + i) + "-1)", centreFromat));
+                    calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", centreFromat));
                 } else
                 // last row
                 if (i == srokCredita) {
@@ -478,10 +451,10 @@ public class CreditFragment extends Fragment {
                     calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR(B" + firstRow  + "), MONTH(B" + firstRow  + ") + " + (i-1) + ", DAY(B" + firstRow  + "))", dateFormat));
                     calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), tengeFormat));
                     calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ")", centreFromat));
-                    calculateSheet.addCell(new Formula(6, currentRow, "(1+A2)*POWER(1+A3, A" + (firstRow - 1 + i) + "-1)", centreFromat));
+                    calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", centreFromat));
                 }
                 calculateSheet.addCell(new Formula(2, currentRow, "E" + (firstRow - 1 + i) + "*'Параметры'!A3*F" + (firstRow - 1 + i) + "/360", yellowTengeFormat));
-                calculateSheet.addCell(new Formula(3, currentRow, "A4-C" + (firstRow - 1 + i), tengeFormat));
+                calculateSheet.addCell(new Formula(3, currentRow, "A1-C" + (firstRow - 1 + i), tengeFormat));
             }
 
             // CellView Auto-Size
