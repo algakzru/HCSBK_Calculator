@@ -261,7 +261,7 @@ public class CreditFragment extends Fragment {
 
             // Excel sheets
             WritableSheet paramsSheet = workbook.createSheet("Параметры", 0);
-            WritableSheet calculateSheet = workbook.createSheet("Вычесление", 1);
+            WritableSheet calculateSheet = workbook.createSheet("Вычисление", 1);
 
             // Borderd cell format
             WritableCellFormat borderFormat = new WritableCellFormat();
