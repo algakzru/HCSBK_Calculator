@@ -11,6 +11,9 @@ import android.widget.EditText;
 
 import java.util.StringTokenizer;
 
+import kz.algakzru.hcsbk_calculator.CreditFragment;
+import kz.algakzru.hcsbk_calculator.R;
+
 /**
  * Created by Shreekrishna Ban on 12/14/2015.
  * This class is used For thousand seperator to the editText
@@ -31,9 +34,9 @@ import java.util.StringTokenizer;
 public class NumberTextWatcherForThousand implements TextWatcher {
 
     private EditText editText;
-    private Fragment fragment;
+    private CreditFragment fragment;
 
-    public NumberTextWatcherForThousand(EditText editText, Fragment fragment) {
+    public NumberTextWatcherForThousand(EditText editText, CreditFragment fragment) {
         this.editText = editText;
         this.fragment = fragment;
     }
@@ -52,6 +55,10 @@ public class NumberTextWatcherForThousand implements TextWatcher {
     public void afterTextChanged(Editable s) {
         try
         {
+            if (R.id.et_ezhemesiachnyi_platezh != editText.getId() && R.id.et_pereplata != editText.getId()) {
+                fragment.etEzhemesiachnyiPlatezh.setText(null);
+                fragment.etPereplata.setText(null);
+            }
             editText.removeTextChangedListener(this);
             String value = editText.getText().toString();
 

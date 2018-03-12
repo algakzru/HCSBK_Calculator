@@ -16,4 +16,9 @@
     <string name="data_pervogo_platezha">data_pervogo_platezha</string>
     <string name="data_vydachi_credita">data_vydachi_credita</string>
 
+    <string-array name="credit_type">
+        <item>Жилищный заем</item>
+        <item>Промежуточный заем «Жеңіл-2»</item>
+    </string-array>
+
 </resources>

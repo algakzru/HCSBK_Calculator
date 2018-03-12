@@ -17,9 +17,12 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import org.joda.time.LocalDate;
 
@@ -59,13 +62,14 @@ import kz.algakzru.hcsbk_calculator.utils.NumberTextWatcherForThousand;
 
 public class CreditFragment extends Fragment {
 
+    private Spinner spCreditType;
     private EditText etSummaCredita;
     private EditText etSrokCredita;
     private EditText etProcentnayaStavka;
     private EditText etDataVydachiCredita;
     private EditText etDataPervogoPlatezha;
-    private EditText etEzhemesiachnyiPlatezh;
-    private EditText etPereplata;
+    public EditText etEzhemesiachnyiPlatezh;
+    public EditText etPereplata;
     private Button btnCalculate;
     private Button btnExport;
 
@@ -90,6 +94,7 @@ public class CreditFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_credit, container, false);
 
+        spCreditType = (Spinner) view.findViewById(R.id.sp_credit_type);
         etSummaCredita = (EditText) view.findViewById(R.id.et_summa_credita);
         etSrokCredita = (EditText) view.findViewById(R.id.et_srok_credita);
         etProcentnayaStavka = (EditText) view.findViewById(R.id.et_procentnaya_stavka);
@@ -116,6 +121,25 @@ public class CreditFragment extends Fragment {
     }
 
     private void setListeners() {
+
+        spCreditType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                try {
+                    etEzhemesiachnyiPlatezh.setText(null);
+                    etPereplata.setText(null);
+                } catch (Exception e) {
+                    new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         etSummaCredita.addTextChangedListener(new NumberTextWatcherForThousand(etSummaCredita, this));
 
@@ -205,19 +229,52 @@ public class CreditFragment extends Fragment {
     }
 
     private void validateEditText() throws Exception {
-        if (TextUtils.isEmpty(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()))){
+
+        // Валидация суммы кредита
+
+        if (TextUtils.isEmpty(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()))) {
             throw new Exception("Вы не указали сумму кредита");
         }
-        if (TextUtils.isEmpty(etSrokCredita.getText().toString())){
+//        double summaCredita = Double.parseDouble(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()));
+//        if (100 * 1000000 < summaCredita) {
+//            throw new Exception("Сумма кредита не может быть больше 100,000,000тг");
+//        }
+//        if (2405 * 500 > summaCredita) {
+//            throw new Exception("Сумма кредита не может быть меньше 1,202,500тг (500 МРП)");
+//        }
+
+        // Валидация срока кредита
+
+        if (TextUtils.isEmpty(etSrokCredita.getText().toString())) {
             throw new Exception("Вы не указали срок кредита");
         }
-        if (TextUtils.isEmpty(etProcentnayaStavka.getText().toString())){
+        int srokCredita = Integer.parseInt(etSrokCredita.getText().toString());
+        if (6 * 12 > srokCredita) {
+            throw new Exception("Срок кредита не может быть меньше 72 месяцев");
+        }
+        if (25 * 12 < srokCredita) {
+            throw new Exception("Срок кредита не может быть больше 300 месяцев");
+        }
+
+        // Валидация процентной ставки
+
+        if (TextUtils.isEmpty(etProcentnayaStavka.getText().toString())) {
             throw new Exception("Вы не указали процентную ставку");
         }
-        if (TextUtils.isEmpty(etDataVydachiCredita.getText().toString())){
+//        double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString());
+//        if (5d < procentnayaStavka) {
+//            throw new Exception("Процентная ставка не может быть больше 5%");
+//        }
+//        if (3.5d > procentnayaStavka) {
+//            throw new Exception("Процентная ставка не может быть меньше 3.5%");
+//        }
+
+        // Валидация даты выдачи кредита и даты первого платежа
+
+        if (TextUtils.isEmpty(etDataVydachiCredita.getText().toString())) {
             throw new Exception("Вы не указали дату выдачи кредита");
         }
-        if (TextUtils.isEmpty(etDataPervogoPlatezha.getText().toString())){
+        if (TextUtils.isEmpty(etDataPervogoPlatezha.getText().toString())) {
             throw new Exception("Вы не указали дату первого платежа");
         }
         LocalDate dataVydachiCredita = new LocalDate(etDataVydachiCredita.getText().toString());
@@ -227,13 +284,6 @@ public class CreditFragment extends Fragment {
         }
         if (dataPervogoPlatezha.isAfter(dataVydachiCredita.plusMonths(1))) {
             throw new Exception("Разница от даты выдачи кредита до даты первого платежа не может превышать один месяц");
-        }
-        int srokCredita = Integer.parseInt(etSrokCredita.getText().toString());
-        if (6 * 12 > srokCredita) {
-            throw new Exception("Срок кредита не может быть меньше 72 месяцев");
-        }
-        if (25 * 12 < srokCredita) {
-            throw new Exception("Срок кредита не может быть больше 300 месяцев");
         }
     }
 
