@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -43,7 +42,6 @@ import jxl.CellView;
 import jxl.DateCell;
 import jxl.LabelCell;
 import jxl.NumberCell;
-import jxl.SheetSettings;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.format.Alignment;
@@ -523,25 +521,25 @@ public class CreditFragment extends Fragment {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "'Параметры'!A5", writableCellFormatMap.get(DATE_FORMAT)));
                 calculateSheet.addCell(new Formula(4, currentRow, "'Параметры'!A1", writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(5, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(5, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5,TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
-            } else
-                // last row
-                if (i == srokCredita) {
-                    calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
-                    calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR('Параметры'!A4), MONTH('Параметры'!A4) + " + srokCredita + ", DAY('Параметры'!A4))", writableCellFormatMap.get(DATE_FORMAT)));
-                    calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
-                    calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ")", writableCellFormatMap.get(CENTRE_FORMAT)));
-                    calculateSheet.addCell(new Label(6, currentRow, "", writableCellFormatMap.get(CENTRE_FORMAT)));
-                }
-                // other rows
-                else {
-                    calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
-                    calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR(B" + firstRow  + "), MONTH(B" + firstRow  + ") + " + (i-1) + ", DAY(B" + firstRow  + "))", writableCellFormatMap.get(DATE_FORMAT)));
-                    calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
-                    calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ")", writableCellFormatMap.get(CENTRE_FORMAT)));
-                    calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
-                }
+            }
+            // last row
+            else if (i == srokCredita) {
+                calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR('Параметры'!A4), MONTH('Параметры'!A4) + " + srokCredita + ", DAY('Параметры'!A4))", writableCellFormatMap.get(DATE_FORMAT)));
+                calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+                calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Label(6, currentRow, "", writableCellFormatMap.get(CENTRE_FORMAT)));
+            }
+            // other rows
+            else {
+                calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR(B" + firstRow  + "), MONTH(B" + firstRow  + ") + " + (i-1) + ", DAY(B" + firstRow  + "))", writableCellFormatMap.get(DATE_FORMAT)));
+                calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+                calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
+            }
             calculateSheet.addCell(new Formula(2, currentRow, "E" + (firstRow - 1 + i) + "*'Параметры'!A3*F" + (firstRow - 1 + i) + "/360", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
             calculateSheet.addCell(new Formula(3, currentRow, "A1-C" + (firstRow - 1 + i), writableCellFormatMap.get(TENGE_FORMAT)));
         }
@@ -585,23 +583,23 @@ public class CreditFragment extends Fragment {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "'Параметры'!A5", writableCellFormatMap.get(DATE_FORMAT)));
                 calculateSheet.addCell(new Formula(5, currentRow, "'Параметры'!A1", writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(6, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5,TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
             }
             // last row
             else if (i == srokCredita) {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR('Параметры'!A4), MONTH('Параметры'!A4) + " + srokCredita + ", DAY('Параметры'!A4))", writableCellFormatMap.get(DATE_FORMAT)));
                 calculateSheet.addCell(new Formula(5, currentRow, "F" + (firstRow - 2 + i) + "-E" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(6, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ")", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
             }
             // other rows
             else {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR(B" + firstRow  + "), MONTH(B" + firstRow  + ") + " + (i-1) + ", DAY(B" + firstRow  + "))", writableCellFormatMap.get(DATE_FORMAT)));
                 calculateSheet.addCell(new Formula(5, currentRow, "F" + (firstRow - 2 + i) + "-E" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(6, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ")", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
             }
-            calculateSheet.addCell(new Formula(2, currentRow, "D" + (firstRow - 1 + i) + "+E" + (firstRow - 1 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+            calculateSheet.addCell(new Formula(2, currentRow, "D" + (firstRow - 1 + i) + "+E" + (firstRow - 1 + i), writableCellFormatMap.get(GREEN_TENGE_FORMAT)));
             calculateSheet.addCell(new Formula(3, currentRow, "F" + (firstRow - 1 + i) + "*'Параметры'!A3*G" + (firstRow - 1 + i) + "/360", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
             calculateSheet.addCell(new Formula(4, currentRow, "'Параметры'!A1/'Параметры'!A2", writableCellFormatMap.get(TENGE_FORMAT)));
         }
@@ -692,19 +690,55 @@ public class CreditFragment extends Fragment {
                 listItems.add(new ListItem("Ежемесячный платёж:", annuitet));
             }
             // Дифференцированный
-            else{
+            else {
+                double pereplata = 0d;
+                double pogashenieOsnovnogoDolga = getPogashenieOsnovnogoDolga();
+                int srokCredita = Integer.parseInt(etSrokCredita.getText().toString());
+                double ostatokOsnovnogoDolga = Double.parseDouble(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()));
+                for (int i=1; i <= srokCredita; i++) {
+                    double procentRaschetnogoPerioda;
+                    LocalDate dataPlatezha;
+                    // first payment
+                    if (1 == i) {
+                        procentRaschetnogoPerioda = getProcentPervogoRaschetnogoPerioda();
+                        dataPlatezha = new LocalDate(etDataPervogoPlatezha.getText().toString());
+                    }
+                    // last row
+                    else if (i == srokCredita) {
+                        procentRaschetnogoPerioda = getProcentPoslednegoRaschetnogoPerioda();
+                        LocalDate dataVydachiCredita = new LocalDate(etDataVydachiCredita.getText().toString());
+                        dataPlatezha = dataVydachiCredita.plusMonths(srokCredita);
+                    }
+                    // other payments
+                    else {
+                        procentRaschetnogoPerioda = getProcentObichnogoRaschetnogoPerioda(i);
+                        LocalDate dataPervogoPlatezha = new LocalDate(etDataPervogoPlatezha.getText().toString());
+                        dataPlatezha = dataPervogoPlatezha.plusMonths(i - 1);
+                    }
+                    double procentBanka = ostatokOsnovnogoDolga * procentRaschetnogoPerioda;
+                    pereplata += procentBanka;
+                    listItems.add(new ListItem("Сумма платежа за " + dataPlatezha.toString("yyyy-MM-dd") + ":", procentBanka + pogashenieOsnovnogoDolga));
+                    ostatokOsnovnogoDolga = ostatokOsnovnogoDolga - pogashenieOsnovnogoDolga;
+                }
 
+                listItems.add(0, new ListItem("Переплата:", pereplata));
             }
 
             CustomAdapter customAdapter = new CustomAdapter(getActivity(), listItems);
             new AlertDialog.Builder(getActivity())
-                    .setTitle("Результат")
+                    .setTitle("Итого")
                     .setAdapter(customAdapter, null)
                     .setPositiveButton("OK", null)
                     .show();
         } catch (Exception e) {
             new AlertDialog.Builder(getActivity()).setTitle("Ошибка").setMessage(e.getMessage()).setNegativeButton("OK", null).show();
         }
+    }
+
+    private double getPogashenieOsnovnogoDolga() throws Exception {
+        double summaCreadita = Double.parseDouble(NumberTextWatcherForThousand.trimCommaOfString(etSummaCredita.getText().toString()));
+        double srokCredita = Double.parseDouble(etSrokCredita.getText().toString());
+        return summaCreadita / srokCredita;
     }
 
     private double getPereplata(double annuitet) throws Exception {
@@ -755,6 +789,16 @@ public class CreditFragment extends Fragment {
     private double getProcentEzhemesiachnyi() throws Exception {
         double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d;
         return procentnayaStavka / 12d;
+    }
+
+    private double getProcentObichnogoRaschetnogoPerioda(int raschiotnyPeriod) throws Exception {
+        LocalDate dataPervogoPlatezha = new LocalDate(etDataPervogoPlatezha.getText().toString());
+        LocalDate firstDate = dataPervogoPlatezha.plusMonths(raschiotnyPeriod - 2);
+        LocalDate secondDate = dataPervogoPlatezha.plusMonths(raschiotnyPeriod - 1);
+        double yearFraction = calculateYearFraction(firstDate, secondDate);
+        double procentnayaStavka = Double.parseDouble(etProcentnayaStavka.getText().toString()) / 100d;
+
+        return yearFraction * procentnayaStavka;
     }
 
     // E thirty day months / 360 ("30E/360")
