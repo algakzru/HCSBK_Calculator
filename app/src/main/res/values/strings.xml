@@ -10,15 +10,16 @@
     <string name="summa_vashih_vznosov">SummaVashihVznosov</string>
     <string name="data_zakritiya">DataZakritiya</string>
 
+    <string name="payment_type">payment_type</string>
     <string name="summa_credita">summa_credita</string>
     <string name="srok_credita">srok_credita</string>
     <string name="procentnaya_stavka">procentnaya_stavka</string>
     <string name="data_pervogo_platezha">data_pervogo_platezha</string>
     <string name="data_vydachi_credita">data_vydachi_credita</string>
 
-    <string-array name="credit_type">
-        <item>Жилищный заем</item>
-        <item>Промежуточный заем «Жеңіл-2»</item>
+    <string-array name="payment_type">
+        <item>Аннуитетный</item>
+        <item>Дифференцированный</item>
     </string-array>
 
 </resources>

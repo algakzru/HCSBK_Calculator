@@ -9,8 +9,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
-import kz.algakzru.hcsbk_calculator.CreditFragment;
-
 /**
  * Created by 816856 on 3/9/2018.
  */
@@ -18,9 +16,9 @@ import kz.algakzru.hcsbk_calculator.CreditFragment;
 public class CustomTextWatcher implements TextWatcher {
 
     private EditText editText;
-    private CreditFragment fragment;
+    private Fragment fragment;
 
-    public CustomTextWatcher(EditText editText, CreditFragment fragment) {
+    public CustomTextWatcher(EditText editText, Fragment fragment) {
         this.editText = editText;
         this.fragment = fragment;
     }
@@ -38,8 +36,6 @@ public class CustomTextWatcher implements TextWatcher {
     @Override
     public void afterTextChanged(Editable editable) {
         try {
-            fragment.etEzhemesiachnyiPlatezh.setText(null);
-            fragment.etPereplata.setText(null);
             String tag = (String) editText.getTag();
             if (!TextUtils.isEmpty(tag)) {
                 SharedPreferences sharedPreferences = fragment.getActivity().getPreferences(Context.MODE_PRIVATE);

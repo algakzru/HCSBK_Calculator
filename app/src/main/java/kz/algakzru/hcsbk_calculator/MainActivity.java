@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_formula) {
             try {
-                View view = LayoutInflater.from(this).inflate(R.layout.dialog_formula, null);
+                View view = getLayoutInflater().inflate(R.layout.dialog_formula, null);
                 new AlertDialog.Builder(this).setTitle("Формула").setView(view).setPositiveButton("OK", null).create().show();
             } catch (Exception e) {
                 new AlertDialog.Builder(this).setTitle("Ошибка").setMessage(e.getClass().getSimpleName() + " " + e.getMessage()).setNegativeButton("OK", null).show();
