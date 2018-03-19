@@ -471,18 +471,18 @@ public class CreditFragment extends Fragment {
     private void addItemsToAnnuitetCalculateSheet(WritableSheet calculateSheet, Map<String, WritableCellFormat> writableCellFormatMap) throws Exception {
         int firstRow = 11;
         int srokCredita = Integer.parseInt(etSrokCredita.getText().toString());
-        calculateSheet.mergeCells(1, 0, 6, 0);
-        calculateSheet.mergeCells(1, 1, 6, 1);
-        calculateSheet.mergeCells(1, 2, 6, 2);
-        calculateSheet.mergeCells(1, 3, 6, 3);
-        calculateSheet.mergeCells(1, 4, 6, 4);
-        calculateSheet.addCell(new Formula(0, 0, "'Параметры'!A1*((1+A3)*(1+A4)*POWER(1+A5,'Параметры'!A2-2))/(1+SUM(G" + firstRow + ":G" + (firstRow+srokCredita-1) + "))", writableCellFormatMap.get(GREEN_TENGE_FORMAT)));
+        calculateSheet.mergeCells(1, 0, 7, 0);
+        calculateSheet.mergeCells(1, 1, 7, 1);
+        calculateSheet.mergeCells(1, 2, 7, 2);
+        calculateSheet.mergeCells(1, 3, 7, 3);
+        calculateSheet.mergeCells(1, 4, 7, 4);
+        calculateSheet.addCell(new Formula(0, 0, "'Параметры'!A1*((1+A3)*(1+A4)*POWER(1+A5,'Параметры'!A2-2))/(1+SUM(H" + firstRow + ":H" + (firstRow+srokCredita-1) + "))", writableCellFormatMap.get(GREEN_TENGE_FORMAT)));
         calculateSheet.addCell(new Label(1, 0, "Ежемесячный платёж", writableCellFormatMap.get(BORDER_FORMAT)));
-        calculateSheet.addCell(new Formula(0, 1, "SUM(C" + firstRow + ":C" + (firstRow+srokCredita-1) + ")", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
+        calculateSheet.addCell(new Formula(0, 1, "SUM(D" + firstRow + ":D" + (firstRow+srokCredita-1) + ")", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
         calculateSheet.addCell(new Label(1, 1, "Переплата", writableCellFormatMap.get(BORDER_FORMAT)));
-        calculateSheet.addCell(new Formula(0, 2, "'Параметры'!A3*F" + firstRow + "/360", writableCellFormatMap.get(PERCENT_FORMAT)));
+        calculateSheet.addCell(new Formula(0, 2, "'Параметры'!A3*G" + firstRow + "/360", writableCellFormatMap.get(PERCENT_FORMAT)));
         calculateSheet.addCell(new Label(1, 2, "Процентная ставка в первом расчётном периоде", writableCellFormatMap.get(BORDER_FORMAT)));
-        calculateSheet.addCell(new Formula(0, 3, "'Параметры'!A3*F" + (firstRow+srokCredita-1) + "/360", writableCellFormatMap.get(PERCENT_FORMAT)));
+        calculateSheet.addCell(new Formula(0, 3, "'Параметры'!A3*G" + (firstRow+srokCredita-1) + "/360", writableCellFormatMap.get(PERCENT_FORMAT)));
         calculateSheet.addCell(new Label(1, 3, "Процентная ставка в последнем расчётном периоде", writableCellFormatMap.get(BORDER_FORMAT)));
         calculateSheet.addCell(new Formula(0, 4, "'Параметры'!A3/12", writableCellFormatMap.get(PERCENT_FORMAT)));
         calculateSheet.addCell(new Label(1, 4, "Процентная ставка в остальных расчётных периодах", writableCellFormatMap.get(BORDER_FORMAT)));
@@ -494,24 +494,27 @@ public class CreditFragment extends Fragment {
             calculateSheet.mergeCells(0, row1, 0, row2);
             calculateSheet.mergeCells(1, row1, 1, row2);
             calculateSheet.mergeCells(2, row1, 2, row2);
-            calculateSheet.mergeCells(3, row1, 3, row2);
-            calculateSheet.mergeCells(4, row1, 4, row2);
+            calculateSheet.mergeCells(3, row1, 4, row1);
             calculateSheet.mergeCells(5, row1, 5, row2);
             calculateSheet.mergeCells(6, row1, 6, row2);
+            calculateSheet.mergeCells(7, row1, 7, row2);
             calculateSheet.addCell(new Label(0, row1, "Расчётный период", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
             calculateSheet.addCell(new Label(1, row1, "Дата погашения", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
-            calculateSheet.addCell(new Label(2, row1, "Погашение вознаграждения", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
-            calculateSheet.addCell(new Label(3, row1, "Погашение основного долга", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
-            calculateSheet.addCell(new Label(4, row1, "Остаток " + System.getProperty("line.separator") +  " основного долга", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
-            calculateSheet.addCell(new Label(5, row1, "Колличество дней", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
-            calculateSheet.addCell(new Label(6, row1, "Коэффициент", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(2, row1, "Сумма платежа", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(3, row1, "Погашение", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(3, row2, "Процентов банка", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(4, row2, "Основного долга", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(5, row1, "Остаток " + System.getProperty("line.separator") +  " основного долга", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(6, row1, "Колличество дней", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
+            calculateSheet.addCell(new Label(7, row1, "Коэффициент", writableCellFormatMap.get(BLUE_TITLE_FORMAT)));
             autoSize(calculateSheet, 0, "Расчётный");
             autoSize(calculateSheet, 1, "погашения");
-            autoSize(calculateSheet, 2, "вознаграждения");
-            autoSize(calculateSheet, 3, "основного долга");
-            autoSize(calculateSheet, 4, "основного долга");
-            autoSize(calculateSheet, 5, "Колличество");
-            autoSize(calculateSheet, 6, "Коэффициент");
+            autoSize(calculateSheet, 2, "Сумма платежа");
+            autoSize(calculateSheet, 3, "Процентов банка");
+            autoSize(calculateSheet, 4, "Основного долга");
+            autoSize(calculateSheet, 5, "основного долга");
+            autoSize(calculateSheet, 6, "Колличество");
+            autoSize(calculateSheet, 7, "Коэффициент");
         }
 
         for (int i=1; i <= srokCredita; i++) {
@@ -520,28 +523,37 @@ public class CreditFragment extends Fragment {
             if (i == 1) {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "'Параметры'!A5", writableCellFormatMap.get(DATE_FORMAT)));
-                calculateSheet.addCell(new Formula(4, currentRow, "'Параметры'!A1", writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(5, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5,TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
-                calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(5, currentRow, "'Параметры'!A1", writableCellFormatMap.get(TENGE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "DAYS('Параметры'!A4,'Параметры'!A5,TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(7, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
             }
             // last row
             else if (i == srokCredita) {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR('Параметры'!A4), MONTH('Параметры'!A4) + " + srokCredita + ", DAY('Параметры'!A4))", writableCellFormatMap.get(DATE_FORMAT)));
-                calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
-                calculateSheet.addCell(new Label(6, currentRow, "", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(5, currentRow, "F" + (firstRow - 2 + i) + "-E" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Label(7, currentRow, "", writableCellFormatMap.get(CENTRE_FORMAT)));
             }
             // other rows
             else {
                 calculateSheet.addCell(new Number(0, currentRow, i, writableCellFormatMap.get(CENTRE_FORMAT)));
                 calculateSheet.addCell(new Formula(1, currentRow, "DATE(YEAR(B" + firstRow  + "), MONTH(B" + firstRow  + ") + " + (i-1) + ", DAY(B" + firstRow  + "))", writableCellFormatMap.get(DATE_FORMAT)));
-                calculateSheet.addCell(new Formula(4, currentRow, "E" + (firstRow - 2 + i) + "-D" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
-                calculateSheet.addCell(new Formula(5, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
-                calculateSheet.addCell(new Formula(6, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(5, currentRow, "F" + (firstRow - 2 + i) + "-E" + (firstRow - 2 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+                calculateSheet.addCell(new Formula(6, currentRow, "DAYS(B" + currentRow + ",B" + (currentRow + 1) + ",TRUE)", writableCellFormatMap.get(CENTRE_FORMAT)));
+                calculateSheet.addCell(new Formula(7, currentRow, "(1+A4)*POWER(1+A5, A" + (firstRow - 1 + i) + "-1)", writableCellFormatMap.get(CENTRE_FORMAT)));
             }
-            calculateSheet.addCell(new Formula(2, currentRow, "E" + (firstRow - 1 + i) + "*'Параметры'!A3*F" + (firstRow - 1 + i) + "/360", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
-            calculateSheet.addCell(new Formula(3, currentRow, "A1-C" + (firstRow - 1 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+            calculateSheet.addCell(new Formula(2, currentRow, "A1", writableCellFormatMap.get(GREEN_TENGE_FORMAT)));
+            calculateSheet.addCell(new Formula(3, currentRow, "F" + (firstRow - 1 + i) + "*'Параметры'!A3*G" + (firstRow - 1 + i) + "/360", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
+            calculateSheet.addCell(new Formula(4, currentRow, "C" + (firstRow - 1 + i) + "-D" + (firstRow - 1 + i), writableCellFormatMap.get(TENGE_FORMAT)));
+        }
+
+        // Pereplata row
+        {
+            int pereplataRow = firstRow + srokCredita - 1;
+            calculateSheet.mergeCells(0, pereplataRow, 2, pereplataRow);
+            calculateSheet.addCell(new Label(0, pereplataRow, "Итого переплата:", writableCellFormatMap.get(CENTRE_FORMAT)));
+            calculateSheet.addCell(new Formula(3, pereplataRow, "SUM(D" + firstRow + ":D" + (firstRow+srokCredita-1) + ")", writableCellFormatMap.get(YELLOW_TENGE_FORMAT)));
         }
     }
 
