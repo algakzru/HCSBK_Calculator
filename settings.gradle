@@ -1,1 +1,7 @@
+pluginManagement {
+    repositories {
+        maven{ url 'http://nexus.sf-express.com/nexus/content/groups/public'}
+    }
+}
+
 include ':app'
