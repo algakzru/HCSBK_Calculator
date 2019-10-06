@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Калькулятор ЖССБ</string>
+    <string name="app_name">Кредитный калькулятор</string>
 
     <string name="title_section1">Жилищный заем</string>
     <string name="title_section2">Депозитный</string>
